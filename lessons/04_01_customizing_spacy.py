@@ -3,9 +3,10 @@
 #        Leveraging spaCy's NER       #
 #               with                  #
 #        Dr. W.J.B. Mattingly         #
+
 import spacy
-from spacy.lang.en import English
-from spacy.pipeline import EntityRuler
+from spacy.lang.en import English #upload do modelo de linguagem como módulo
+from spacy.pipeline import EntityRuler # módulo que permite criar regras de NER
 import json
 
 
@@ -19,6 +20,9 @@ def save_data(file, data):
         json.dump(data, f, indent=4)
 
 def generate_better_characters(file):
+    """
+    Script para gerar uma lista de personagens mais refinada
+    """
     data = load_data(file)
     print (len(data))
     new_characters = []
@@ -54,8 +58,7 @@ def generate_better_characters(file):
             for title in titles:
                 titled_char = f"{title} {character}"
                 final_characters.append(titled_char)
-
-
+   
     print (len(final_characters))
     final_characters = list(set(final_characters))
     print (len(final_characters))
@@ -63,6 +66,9 @@ def generate_better_characters(file):
     return (final_characters)
 
 def create_training_data(file, type):
+    """
+    Cria os padrões de treinamento para o EntityRuler
+    """
     data = generate_better_characters(file)
     patterns = []
     for item in data:
@@ -74,11 +80,21 @@ def create_training_data(file, type):
     return (patterns)
 
 def generate_rules(patterns):
+    """
+    Gera as regras para o EntityRuler
+    Versão original mantida com linhas comentadas. Os scripts abaixo são a versão atualizada
+    """
     nlp = English()
-    ruler = EntityRuler(nlp)
+    #ruler = EntityRuler(nlp)
+    ruler = nlp.add_pipe("entity_ruler") #inserido
     ruler.add_patterns(patterns)
-    nlp.add_pipe(ruler)
+    #nlp.add_pipe("ruler")
     nlp.to_disk("hp_ner")
+
+# Script abaixo é usado apenas para criar o modelo de NER
+# patterns = create_training_data("data/hp_characters.json", "PERSON")
+# generate_rules(patterns)
+
 
 def test_model(model, text):
     doc = nlp(text)
@@ -87,13 +103,10 @@ def test_model(model, text):
         results.append(ent.text)
     return (results)
 
-patterns = create_training_data("data/hp_characters.json", "PERSON")
-generate_rules(patterns)
-# print (patterns)
 
 nlp = spacy.load("hp_ner")
 ie_data = {}
-with open ("data/hp.txt", "r")as f:
+with open ("data/hp.txt", "r") as f:
     text = f.read()
 
     chapters = text.split("CHAPTER")[1:]

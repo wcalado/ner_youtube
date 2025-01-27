@@ -3,6 +3,8 @@
 #        Leveraging spaCy's NER       #
 #               with                  #
 #        Dr. W.J.B. Mattingly         #
+
+# In this lesson, we will be creating a training dataset for our NER model using the Harry Potter text. We will then use this dataset to train a new NER model.
 import spacy
 import json
 import random
@@ -17,6 +19,9 @@ def save_data(file, data):
         json.dump(data, f, indent=4)
 
 def test_model(model, text):
+    """
+    Cria um modelo de teste para o NER usando um modelo de linguagem e um texto
+    """
     doc = nlp(text)
     results = []
     entities = []
@@ -47,4 +52,5 @@ with open ("data/hp.txt", "r")as f:
                 TRAIN_DATA.append(results)
 
 print (len(TRAIN_DATA))
-# save_data("data/hp_training_data.json", TRAIN_DATA)
+print (TRAIN_DATA[0])
+save_data("data/hp_training_data.json", TRAIN_DATA)
